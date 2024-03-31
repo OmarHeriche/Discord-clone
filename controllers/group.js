@@ -7,7 +7,7 @@ const getSingleGroup = (req, res) => {
     .json({ success: true, msg: `get group with id ${req.params.id}` });
 };
 const addGroup = (req, res) => {
-  res.status(200).json({ success: true, msg: `add new group ` });
+  res.status(200).json({ success: true, msg: `add new group` });
 };
 const deleteGroup = (req, res) => {
   res
