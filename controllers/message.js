@@ -1,8 +1,13 @@
+const Message = require('../models/message')
+
 const getAllMessages = (req,res)=>{
     res.status(200).json({msg:"Messages fetched",data:[]})
 }
-const createMessage = (req,res)=>{
-    res.status(201).json({msg:"Message created"})
+const createMessage = async (req,res)=>{
+    req.body.createdBy = req.user.userId;
+    req.body.recipientId = req.params.recipientId;
+    const message = await Message.create(req.body);
+    res.status(201).json({msg:"Message created",data:message})
 }
 const updateMessage = (req,res)=>{
     res.status(200).json({msg:"Message updated"})

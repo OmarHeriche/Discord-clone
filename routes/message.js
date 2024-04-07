@@ -7,6 +7,6 @@ const {
 }=require('../controllers/message');
 
 const router = express.Router();
-router.route('/').get(getAllMessages).post(createMessage);
-router.route('/:id').delete(deleteMessage).patch(updateMessage);
+router.route('/:recipientId').post(createMessage).get(getAllMessages);
+router.route('/:recipientId/:messageId').patch(updateMessage).delete(deleteMessage);
 module.exports = router;
