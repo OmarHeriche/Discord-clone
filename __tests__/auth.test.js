@@ -71,3 +71,10 @@ describe.skip("/api/v1/auth/register", () => {
     expect(refreshToken).toBeDefined();
   })
 });
+
+describe("check the login",()=>{
+  describe("check the login with the correct data && the user is found",()=>{
+    
+  })
+})
+

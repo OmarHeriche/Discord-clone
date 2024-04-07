@@ -9,12 +9,13 @@ const register_login_router = require("./routes/auth");
 const groupRouter = require("./routes/group");
 const messageRouter = require("./routes/message");
 const auth = require("./middleware/authentication");
+const refreshToken = require("./middleware/refreshToken");
 require("dotenv").config();
 require("express-async-errors");
 //!import :end
 
 const createApp = require('./app');
-const app = createApp(express,notFound,userRouter,friendRouter,register_login_router,groupRouter,messageRouter,auth,cookieParcer);
+const app = createApp(express,notFound,userRouter,friendRouter,register_login_router,groupRouter,messageRouter,auth,cookieParcer,refreshToken);
 const PORT = process.env.PORT || 3000;
 
 const start = async () => {

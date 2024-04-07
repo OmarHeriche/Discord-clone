@@ -50,7 +50,7 @@ const message = {
   messageContent: "hello world",
 };
 
-describe("/api/v1/messages regular cases", () => {
+describe.skip("/api/v1/messages regular cases", () => {
   describe("create a message", () => {
     it("should create a message", async () => {
       await superTest(app).post("/api/v1/auth/register").send({

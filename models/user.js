@@ -48,5 +48,8 @@ UserSchema.methods.createAccessToken = function () {
     { expiresIn: "10s" }
   );
 };
+UserSchema.methods.validePassword=function (notHashedPassword){
+  return bcrypt.compareSync(notHashedPassword,this.password);
+}
 
 module.exports = mongoose.model("User", UserSchema);
