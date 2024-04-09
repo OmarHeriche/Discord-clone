@@ -1,6 +1,12 @@
 const User = require("../models/user");
 const getAllUsers = async (req, res) => {
-  const users = await User.find({});
+  const userName = req.query.userName;
+  const queryObject = {};
+  if(userName){
+    queryObject.userName = { $regex: userName, $options: "i" };
+  }
+  const users = await User.find(queryObject).sort("userName");
+  if(!users) return res.status(404).json({success:false,message:`user with name ${userName} not found`});
   res
     .status(200)
     .json({ success: true, data: users, numberOfUsers: users.length });
