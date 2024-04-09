@@ -7,7 +7,7 @@ const createMessage = async (req,res)=>{
     req.body.createdBy = req.user.userId;
     req.body.recipientId = req.params.recipientId;
     const message = await Message.create(req.body);
-    res.status(201).json({msg:"Message created",data:message})
+    res.status(201).json({success:true,data:message})
 }
 const updateMessage = (req,res)=>{
     res.status(200).json({msg:"Message updated"})
