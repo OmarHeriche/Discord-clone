@@ -25,6 +25,12 @@ const updateMessage = async (req, res) => {
         { messageContent: req.body.messageContent },
         { new: true, runValidators: true }
     );
+    if (!newMessage) {
+        return res.status(404).json({
+            msg: `there is no message with id = ${messageId}`,
+            success: false,
+        });
+    }
     res.status(200).json({ success: true, data: newMessage });
 };
 const deleteMessage = async (req, res) => {
