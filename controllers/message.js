@@ -3,7 +3,9 @@ const Message = require("../models/message");
 const getAllMessages = async (req, res) => {
     req.body.createdBy = req.user.userId;
     req.body.recipientId = req.params.recipientId;
-    const messages = await Message.find(req.body).sort("updatedAt");
+    const messagesCreatedByMe = await Message.find(req.body).sort("updatedAt");
+    const messagesReceivedByMe = await Message.find({createdBy:req.body.recipientId,recipientId:req.body.createdBy}).sort("updatedAt");
+    const messages = messagesCreatedByMe.concat(messagesReceivedByMe);
     res.status(200).json({ success: true, data: messages });
 };
 const createMessage = async (req, res) => {
