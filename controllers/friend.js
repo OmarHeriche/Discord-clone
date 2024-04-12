@@ -7,6 +7,7 @@ const getAllFriends = async (req, res) => {
             userID: req.user.userId,
         });
         const promisesArray = await allFriendsRelations.map(async (friend) => {
+            //! every time im doing a full body scan of the user collection to get the friend info, this is not efficient, i should use the populate method to get the friend info
             friend = await User.findOne({ _id: friend.friendID.toString() });
             if (!friend) {
                 /*🦈**/ return res.status(404).json({
