@@ -11,6 +11,11 @@ const UserGroupSchema = new mongoose.Schema({
         ref: "Group",
         required: [true, "please provide group id"],
     },
+    role: {
+        type: String,
+        enum: ["admin", "member","omar"],
+        default: "member",
+    },
 },{timestamps: true});
 
 module.exports = mongoose.model("UserGroup", UserGroupSchema);
