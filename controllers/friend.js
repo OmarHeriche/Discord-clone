@@ -20,7 +20,6 @@ const getAllFriends = async (req, res) => {
         const friendsInfos = await Promise.all(promisesArray);//?is this will wait for all promises to be resolved before returning the result?=>yesyes🫡
         res.status(200).json({
             success: true,
-            // relations: allFriendsRelations,
             data: friendsInfos,
         });
     } catch (error) {
