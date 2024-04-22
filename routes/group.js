@@ -6,12 +6,14 @@ const {
     deleteGroup,
     updateGroup,
     addUserToGroup,
-    deleteUserFromGroup
+    deleteUserFromGroup,
+    getAllMembersOfGroup
 }=require('../controllers/group');
 
 const router = express.Router();
 router.route('/').get(getAllGroups).post(addGroup);
 router.route('/:groupId').get(getSingleGroup).delete(deleteGroup).patch(updateGroup);
-router.route('/:groupId/:userId').post(addUserToGroup).delete(deleteUserFromGroup);
+router.route('/:groupId/members').get(getAllMembersOfGroup);
+router.route('/:groupId/members/:userId').post(addUserToGroup).delete(deleteUserFromGroup);
 
 module.exports = router;

@@ -13,4 +13,7 @@ const UserFriendSchema = new mongoose.Schema({
     },
 },{timestamps: true});
 
-module.exports = mongoose.model("UserFriend", UserFriendSchema);
+//?make the combination of userID and friendID unique.
+UserFriendSchema.index({ userID: 1, friendID: 1 }, { unique: true });
+
+module.exports = mongoose.model("UserFriend", UserFriendSchema); 

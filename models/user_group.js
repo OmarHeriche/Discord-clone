@@ -18,5 +18,7 @@ const UserGroupSchema = new mongoose.Schema({
     },
 },{timestamps: true});
 
+//? make the combination of userID and groupID and role unique.
+UserGroupSchema.index({ userID: 1, groupID: 1 }, { unique: true });
 
 module.exports = mongoose.model("UserGroup", UserGroupSchema);

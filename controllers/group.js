@@ -1,5 +1,6 @@
 const Group = require("../models/group");
 const UserGroup = require("../models/user_group");
+const User = require("../models/user");
 
 const getAllGroups = async (req, res) => {
   try {
@@ -100,16 +101,37 @@ const addUserToGroup = async (req, res) => {
     res.status(500).json({ success: false, msg: error.message });
   }
 };
-const deleteUserFromGroup = (req, res) => {
-  res.status(200).json({
-    success: true,
-    msg: {
-      msg: "delete user from group",
-      groupId: req.params.groupId,
-      userId: req.params.userId,
-    },
-  });
+const deleteUserFromGroup = async (req, res) => {
+  try {
+    const checkIfImTheAdmin = await UserGroup.findOne({userID:req.user.userId,groupID:req.params.groupId});
+    if(checkIfImTheAdmin.role!=="admin"){
+      return res.status(400).json({success:false,msg:`you are not a admin do delete user from this group`});
+    }
+    const deletedUser = await UserGroup.findOneAndDelete({userID:req.params.userId,groupID:req.params.groupId});
+    if(!deletedUser){
+      return res.status(404).json({success:false,msg:`user with id ${req.params.userId} not found in the group with id ${req.params.groupId}`});
+    }
+    res.status(200).json({ success: true, msg: `user with id ${req.params.userId} deleted from the group with id ${req.params.groupId}` });
+  } catch (error) {
+    res.status(500).json({ success: false, msg: error.message });
+  }
 };
+const getAllMembersOfGroup = async (req,res)=>{
+  try {
+    const arrayOfRelations = await UserGroup.find({groupID:req.params.groupId});
+    if(!arrayOfRelations){
+      return res.status(404).json({success:false,msg:`group with id ${req.params.groupId} not found`});
+    }
+    const promisesArray = await arrayOfRelations.map(async (relation_userGroup) => {
+      relation_userGroup = await User.findOne({_id:relation_userGroup.userID});
+      return relation_userGroup;
+    });
+    const membersArray = await Promise.all(promisesArray);
+    res.status(200).json({ success: true, data: membersArray });
+  } catch (error) {
+    res.status(500).json({ success: false, msg: error.message });
+  }
+}
 
 module.exports = {
   getAllGroups,
@@ -119,4 +141,5 @@ module.exports = {
   updateGroup,
   addUserToGroup,
   deleteUserFromGroup,
+  getAllMembersOfGroup
 };
