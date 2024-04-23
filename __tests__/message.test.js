@@ -46,30 +46,74 @@ afterAll(async () => {
     await mongoose.connection.close();
 });
 
+
+const recipient = {
+    userName: "get",
+    email: "get@gmail.com",
+    password: "password",
+    _id: new mongoose.Types.ObjectId().toString()
+};
+
 describe("testing the perfect cases 🔴 the user is logged in && 🔴 the recipient is exist", () => {
     describe("testing the  /api/v1/message/:recipientId => createMessage", () => {
-        it("should return status 201", async () => {
+        it("should return status 201 && res.body = success=true , data = message", async () => {
             //?create the sender user:start
-            await superTest(app).post("/api/v1/register").send({
+            const sender = await superTest(app).post("/api/v1/auth/register").send({
                 userName: "send",
                 email: "send@gmail.com",
                 password: "password",
             });
-            const recipient = await superTest(app).post("/api/v1/register").send({
-                userName: "get",
-                email: "get@gmail.com",
-                password: "password",
-            });
-            console.log("🔴🔴🔴🔴🔴🔴",recipient.body);
-            await superTest(app).post("/api/v1/login").send({
-                email: "send@gmail.com",
+            //?create the sender user:end
+
+            //?get cookies :start
+            const cookies = sender.headers["set-cookie"];
+            //?get cookies :end
+
+            //?send the message to the recipient:start
+            const response = await superTest(app).post(`/api/v1/messages/${recipient._id}`).send({
+                messageContent: "hello ricipient im the sender",
+            }).set("cookie", cookies);
+            expect(response.status).toBe(201);
+            expect(response.body.success).toBe(true);
+            expect(response.body.data.messageContent).toBe("hello ricipient im the sender");
+            //?send the message to the recipient:end
+        });
+    });
+
+    describe("testing the  /api/v1/message/:recipientId => getAllMessages", () => {
+        it("should return status 200 && res.body = success=true , data = messages", async () => {
+            //?create the sender user:start
+            const sender = await superTest(app).post("/api/v1/auth/register").send({
+                userName: "send1",
+                email: "send1@gmail.com",
                 password: "password",
             });
             //?create the sender user:end
-            //?send the message to the recipient:start
-            // const response = await superTest(app).post(`/api/v1/message/${recipient.body.data._id}`).send({
-            //     messageContent: "hi",
-            // });
+
+            //?get cookies :start
+            const cookies = sender.headers["set-cookie"];
+            //?get cookies :end
+
+            //?send the messages to the recipient:start
+            await superTest(app).post(`/api/v1/messages/${recipient._id}`).send({
+                messageContent: "first message",
+            }).set("cookie", cookies);
+            await superTest(app).post(`/api/v1/messages/${recipient._id}`).send({
+                messageContent: "second message",
+            }).set("cookie", cookies);
+            await superTest(app).post(`/api/v1/messages/${recipient._id}`).send({
+                messageContent: "third message",
+            }).set("cookie", cookies);
+            //?send the messages to the recipient:end
+
+
+            const response = await superTest(app).get(`/api/v1/messages/${recipient._id}`).set("cookie", cookies);
+
+            expect(response.status).toBe(200);
+            expect(response.body.success).toBe(true);
+            expect(response.body.data[0].messageContent).toBe("first message");
+            expect(response.body.data[1].messageContent).toBe("second message");
+            expect(response.body.data[2].messageContent).toBe("third message");
             //?send the message to the recipient:end
         });
     });
