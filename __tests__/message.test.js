@@ -1,4 +1,5 @@
 //!import :start
+const refreshToken = require("../middleware/refreshToken");
 const jwt = require("jsonwebtoken");
 const express = require("express");
 const notFound = require("../middleware/notFound");
@@ -30,7 +31,8 @@ const app = createApp(
   groupRouter,
   messageRouter,
   auth,
-  cookieParcer
+  cookieParcer,
+  refreshToken
 );
 
 beforeAll(async () => {

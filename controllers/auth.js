@@ -85,9 +85,7 @@ const login = async (req, res) => {
         //!send response
         res.status(200).json({
             success: true,
-            user: {
-                name: user.userName,
-            },
+            name: user.userName,
         });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message,errorPoint:"from login controller" });
