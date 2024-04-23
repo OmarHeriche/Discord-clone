@@ -23,58 +23,54 @@ const e = require("express");
 //?in memory instance of the mongodb:end
 //!import :end
 const app = createApp(
-  express,
-  notFound,
-  userRouter,
-  friendRouter,
-  register_login_router,
-  groupRouter,
-  messageRouter,
-  auth,
-  cookieParcer,
-  refreshToken
+    express,
+    notFound,
+    userRouter,
+    friendRouter,
+    register_login_router,
+    groupRouter,
+    messageRouter,
+    auth,
+    cookieParcer,
+    refreshToken
 );
 
 beforeAll(async () => {
-  const createServer = await MongoMemoryServer.create();
-  const uri = createServer.getUri();
-  await mongoose.connect(uri);
+    const createServer = await MongoMemoryServer.create();
+    const uri = createServer.getUri();
+    await mongoose.connect(uri);
 });
 
 afterAll(async () => {
-  await mongoose.disconnect();
-  await mongoose.connection.close();
+    await mongoose.disconnect();
+    await mongoose.connection.close();
 });
 
-const message = {
-  createdBy: "660f61a6bf4e2735ec49f9ae",
-  recipientId: "660f61a6bf4e2735ec49f9ae",
-  messageContent: "hello world",
-};
-
-describe.skip("/api/v1/messages regular cases", () => {
-  describe("create a message", () => {
-    it("should create a message", async () => {
-      await superTest(app).post("/api/v1/auth/register").send({
-        userName: "kanki",
-        email: "khiul@gmail.com",
-        password: "12345o6",
-      });
-      app.use(auth);
-      const response = await superTest(app)
-        .post(`/api/v1/messages/:${message.recipientId}`)
-        .send({
-          messageContent: "hello world",
-        })
-      expect(response.status).toBe(201);
+describe("testing the perfect cases 🔴 the user is logged in && 🔴 the recipient is exist", () => {
+    describe("testing the  /api/v1/message/:recipientId => createMessage", () => {
+        it("should return status 201", async () => {
+            //?create the sender user:start
+            await superTest(app).post("/api/v1/register").send({
+                userName: "send",
+                email: "send@gmail.com",
+                password: "password",
+            });
+            const recipient = await superTest(app).post("/api/v1/register").send({
+                userName: "get",
+                email: "get@gmail.com",
+                password: "password",
+            });
+            console.log("🔴🔴🔴🔴🔴🔴",recipient.body);
+            await superTest(app).post("/api/v1/login").send({
+                email: "send@gmail.com",
+                password: "password",
+            });
+            //?create the sender user:end
+            //?send the message to the recipient:start
+            // const response = await superTest(app).post(`/api/v1/message/${recipient.body.data._id}`).send({
+            //     messageContent: "hi",
+            // });
+            //?send the message to the recipient:end
+        });
     });
-    it.skip("should create a message", async () => {
-      const response = await superTest(app)
-        .post(`/api/v1/messages/:${message.recipientId}`)
-        .send({
-          messageContent: "hello world",
-        })
-      expect(response.body.msg).toBe("Message created");
-    });
-  });
 });

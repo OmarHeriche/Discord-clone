@@ -107,7 +107,6 @@ describe("the best cases for the auth controllers", () => {
             const response = await superTest(app)
                 .post("/api/v1/auth/login")
                 .send({
-                    userName: "omar1",
                     email: "omar1@gmail.com",
                     password: "password",
                 });
@@ -117,7 +116,6 @@ describe("the best cases for the auth controllers", () => {
             const response = await superTest(app)
                 .post("/api/v1/auth/login")
                 .send({
-                    userName: "omar1",
                     email: "omar1@gmail.com",
                     password: "password",
                 });
@@ -130,7 +128,6 @@ describe("the best cases for the auth controllers", () => {
             const response = await superTest(app)
                 .post("/api/v1/auth/login")
                 .send({
-                    userName: "omar1",
                     email: "omar1@gmail.com",
                     password: "password",
                 });
