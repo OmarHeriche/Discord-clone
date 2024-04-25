@@ -54,6 +54,7 @@ const recipient = {
     _id: new mongoose.Types.ObjectId().toString()
 };
 
+
 describe("testing the perfect cases 🔴 the user is logged in && 🔴 the recipient is exist", () => {
     describe("testing the  /api/v1/message/:recipientId => createMessage", () => {
         it("should return status 201 && res.body = success=true , data = message", async () => {
@@ -116,6 +117,62 @@ describe("testing the perfect cases 🔴 the user is logged in && 🔴 the recip
             expect(response.body.data[2].messageContent).toBe("third message");
             //?send the message to the recipient:end
         });
+    });
+
+    describe("/api/v1/message/:recipientId/:messageId => updateMessage", () => {
+        it("should return status = 200",async ()=>{
+
+            //?create the sender user: start
+            const sender = await superTest(app).post("/api/v1/auth/register").send({
+                userName: "send2",
+                email: "send2@gmail.com",
+                password: "password",
+            });
+            //?create the sender user: end
+
+            //?get cookies : start
+            const cookies = sender.headers["set-cookie"];
+            //?get cookies : end
+
+            const theCreatedMessage = await superTest(app).post(`/api/v1/messages/${recipient._id}`).send({
+                messageContent: "first message",
+            }).set("cookie", cookies);
+
+
+            const theUpdatedMessage = await superTest(app).patch(`/api/v1/messages/${recipient._id}/${theCreatedMessage.body.data._id}`).send({
+                messageContent: "the updated message",
+            }).set("cookie", cookies);
+
+            expect(theUpdatedMessage.status).toBe(200);
+            expect(theUpdatedMessage.body.data.messageContent).toBe("the updated message");
+        })
+    });
+    describe("/api/v1/message/:recipientId/:messageId => delete", () => {
+        it("should return status = 200",async ()=>{
+
+            //?create the sender user: start
+            const sender = await superTest(app).post("/api/v1/auth/register").send({
+                userName: "send3",
+                email: "send3@gmail.com",
+                password: "password",
+            });
+            //?create the sender user: end
+
+            //?get cookies : start
+            const cookies = sender.headers["set-cookie"];
+            //?get cookies : end
+
+            const theCreatedMessage = await superTest(app).post(`/api/v1/messages/${recipient._id}`).send({
+                messageContent: "first message",
+            }).set("cookie", cookies);
+
+
+            const deletedMessage = await superTest(app).delete(`/api/v1/messages/${recipient._id}/${theCreatedMessage.body.data._id}`).set("cookie", cookies);
+            console.log(deletedMessage.body);
+            expect(deletedMessage.status).toBe(200);
+            expect(deletedMessage.body.success).toBe(true);
+            expect(deletedMessage.body.data._id).toStrictEqual(theCreatedMessage.body.data._id);
+        })
     });
 });
 //todo set the list of the others controllers ⬇️ 
