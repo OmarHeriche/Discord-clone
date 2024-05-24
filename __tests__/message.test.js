@@ -34,27 +34,21 @@ const app = createApp(
     cookieParcer,
     refreshToken
 );
-
 beforeAll(async () => {
     const createServer = await MongoMemoryServer.create();
     const uri = createServer.getUri();
     await mongoose.connect(uri);
 });
-
 afterAll(async () => {
     await mongoose.disconnect();
     await mongoose.connection.close();
 });
-
-
 const recipient = {
     userName: "get",
     email: "get@gmail.com",
     password: "password",
     _id: new mongoose.Types.ObjectId().toString()
 };
-
-
 describe("testing the perfect cases 🔴 the user is logged in && 🔴 the recipient is exist", () => {
     describe("testing the  /api/v1/message/:recipientId => createMessage", () => {
         it("should return status 201 && res.body = success=true , data = message", async () => {
@@ -80,7 +74,6 @@ describe("testing the perfect cases 🔴 the user is logged in && 🔴 the recip
             //?send the message to the recipient:end
         });
     });
-
     describe("testing the  /api/v1/message/:recipientId => getAllMessages", () => {
         it("should return status 200 && res.body = success=true , data = messages", async () => {
             //?create the sender user:start

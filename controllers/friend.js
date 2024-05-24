@@ -48,7 +48,6 @@ const getSingleFriend = async (req, res) => {
         res.status(500).json({ success: false, msg: error.message });
     }
 };
-
 const deleteFriend = async (req, res) => {
     try {
         const friendToBeDeleted = await Friend.findByIdAndDelete({
