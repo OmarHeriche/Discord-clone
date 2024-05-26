@@ -49,17 +49,17 @@ beforeEach(async()=>{
     await superTest(app).post("/api/v1/auth/register").send({
         userName: "user1",
         email: "user1@gmail.com",
-        password: "password1",
+        password: "password",
     })
     await superTest(app).post("/api/v1/auth/register").send({
         userName: "user2",
         email: "user2@gmail.com",
-        password: "password1",
+        password: "password",
     })
     await superTest(app).post("/api/v1/auth/register").send({
         userName: "user3",
         email: "user3@gmail.com",
-        password: "password1",
+        password: "password",
     })
     //?create the 3 users:end
 })
@@ -69,7 +69,7 @@ describe("/api/v1/users => getAllUsers",()=>{
         const currentUser = await superTest(app).post("/api/v1/auth/register").send({
             userName: "omar",
             email: "omar@gmail.com",
-            password: "password1",
+            password: "password",
         });
 
         const cookies = currentUser.headers["set-cookie"];
@@ -82,16 +82,15 @@ describe("/api/v1/users => getAllUsers",()=>{
         expect(res.body.data[1].password.length>8).toBe(true);//?the password should be hashed if the length is more than 8"the length of the unhashed password is 8"
         expect(res.body.data[2].password.length>8).toBe(true);//?the password should be hashed if the length is more than 8"the length of the unhashed password is 8"
         expect(res.body.data[3].password.length>8).toBe(true);//?the password should be hashed if the length is more than 8"the length of the unhashed password is 8"
-        console.log(res.body.data)
     });
 })
 
-describe("/api/v1/users => getSingleUser",()=>{
+describe("/api/v1/users/:userId => getSingleUser",()=>{
     it("test the best cases only",async()=>{
         const currentUser = await superTest(app).post("/api/v1/auth/register/").send({
             userName: "omarHeriche",
             email: "omarHeriche@gmail.com",
-            password: "password1",
+            password: "password",
         });
 
         const cookies = currentUser.headers["set-cookie"];
@@ -106,4 +105,30 @@ describe("/api/v1/users => getSingleUser",()=>{
         expect(res2.body.data.password.length>8).toBe(true);//?the password should be hashed if the length is more than 8"the length of the unhashed password is 8"
     });
 })
+
+describe("/api/v1/users/:userId => addFriend",()=>{
+    it("test the best cases only",async()=>{
+        const currentUser = await superTest(app).post("/api/v1/auth/register/").send({
+            userName: "omarHeriche1",
+            email: "omarHeriche1@gmail.com",
+            password: "password",
+        });
+
+        const cookies = currentUser.headers["set-cookie"];
+
+        const res = await superTest(app).get("/api/v1/users").set("cookie",cookies);
+        const singleUser0_id = res.body.data[0]._id;
+        
+        const res2 = await superTest(app).post(`/api/v1/users/${singleUser0_id}`).set("cookie",cookies);
+        expect(res2.status).toBe(201);
+        expect(res2.body.success).toBe(true);
+        expect(res2.body.data.friendID).toBe(singleUser0_id);
+        accessToken = cookies[0].split(";")[0].split("=")[1];
+        const payload = jwt.verify(accessToken,process.env.ACCESS_TOKEN_SECRET);
+        expect(res2.body.data.userID).toBe(payload.userId);//! hadi haja for bzzaf 🤌🤌🤌🤌🤌🤌
+    });
+
+}) 
+
+
 
