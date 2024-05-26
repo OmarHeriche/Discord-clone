@@ -23,7 +23,7 @@ const getAllGroups = async (req, res) => {
 };
 const getSingleGroup = async (req, res) => {
   try {
-    const targetedGroup = await Group.findOne({_id:req.params.groupId});
+    const targetedGroup = await Group.findOne({_id:req.params.groupId});//!here there is a problem if the user is not a member of the group he can see the group.
     if(!targetedGroup){
       return res.status(404).json({success:false,msg:`group with id ${req.params.groupId} not found`});
     }
@@ -51,7 +51,7 @@ const deleteGroup = async (req, res) => {
     //todo 1.1 check the role of the user.
     const the_relation_userGroup_that_willBeDeleted = await UserGroup.findOne({userID:req.user.userId,groupID:req.params.groupId});
     if(the_relation_userGroup_that_willBeDeleted.role!=="admin"){
-      return res.status(400).json({success:false,msg:`you are not a admin do delete this group`});
+      return res.status(400).json({success:false,msg:`you are not a admin to delete this group`});
     }
 
     const arrayOfRelationsToDelete = await UserGroup.find({groupID:req.params.groupId});

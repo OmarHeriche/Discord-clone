@@ -93,7 +93,7 @@ describe("the best cases for the auth controllers", () => {
     });
 
     describe("/api/v1/auth/login <=> login a user perfect case", () => {
-        //!create a user :start
+        //!1️⃣create a user :start
         it("check status = 200", async () => {
             await superTest(app).post("/api/v1/auth/register").send({
                 userName: "omar1",
