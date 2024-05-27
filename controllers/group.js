@@ -105,7 +105,7 @@ const deleteUserFromGroup = async (req, res) => {
   try {
     const checkIfImTheAdmin = await UserGroup.findOne({userID:req.user.userId,groupID:req.params.groupId});
     if(checkIfImTheAdmin.role!=="admin"){
-      return res.status(400).json({success:false,msg:`you are not a admin do delete user from this group`});
+      return res.status(400).json({success:false,msg:`you are not a admin to delete user from this group`});
     }
     const deletedUser = await UserGroup.findOneAndDelete({userID:req.params.userId,groupID:req.params.groupId});
     if(!deletedUser){

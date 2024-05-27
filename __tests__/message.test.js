@@ -161,7 +161,6 @@ describe("testing the perfect cases 🔴 the user is logged in && 🔴 the recip
 
 
             const deletedMessage = await superTest(app).delete(`/api/v1/messages/${recipient._id}/${theCreatedMessage.body.data._id}`).set("cookie", cookies);
-            console.log(deletedMessage.body);
             expect(deletedMessage.status).toBe(200);
             expect(deletedMessage.body.success).toBe(true);
             expect(deletedMessage.body.data._id).toStrictEqual(theCreatedMessage.body.data._id);

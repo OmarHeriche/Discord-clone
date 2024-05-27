@@ -6,7 +6,7 @@ const refreshToken = async (req,res,next)=>{
     const expirationTime = req.cookies.expire;
     const currentTime = Math.floor(Date.now() / 1000);
     if(currentTime < expirationTime){
-        console.log("the access token is still valid");
+        // console.log("the access token is still valid");
         next();
         return;
     }
