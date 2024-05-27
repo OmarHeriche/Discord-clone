@@ -44,52 +44,52 @@ afterAll(async () => {
     await mongoose.connection.close();
 });
 
-beforeEach(async () => {
-    //?create the 3 users:start
-    const user1 = await superTest(app).post("/api/v1/auth/register").send({
-        userName: "user1",
-        email: "user1@gmail.com",
-        password: "password",
-    });
-    const user2 = await superTest(app).post("/api/v1/auth/register").send({
-        userName: "user2",
-        email: "user2@gmail.com",
-        password: "password",
-    });
-    const user3 = await superTest(app).post("/api/v1/auth/register").send({
-        userName: "user3",
-        email: "user3@gmail.com",
-        password: "password",
-    });
-    //?create the 3 users:end
-    //?create the main user : start
-    const mainUser = await superTest(app).post("/api/v1/auth/register").send({
-        userName: "mainUser",
-        email: "mainUser@gmail.com",
-        password: "password",
-    });
-    const cookies = mainUser.headers["set-cookie"];
-    //?create the main user : end
-    //!add 2 users as friends to the main user :start
-    await superTest(app)
-        .post(`/api/v1/users/${user1.body.userId}`)
-        .set("cookie", cookies);
-    await superTest(app)
-        .post(`/api/v1/users/${user2.body.userId}`)
-        .set("cookie", cookies);
-    //!add 2 users as friends to the main user :end
-});
-
 describe("test only best cases here", () => {
     describe("/api/v1/friends => getAllFriends", () => {
         it("should return status 200 and the friends of the main user", async () => {
-            const mainUser = await superTest(app)
-                .post("/api/v1/auth/login")
+            //todo before each :start
+            //?create the 3 users:start
+            const user1 = await superTest(app)
+                .post("/api/v1/auth/register")
                 .send({
+                    userName: "user1",
+                    email: "user1@gmail.com",
+                    password: "password",
+                });
+            const user2 = await superTest(app)
+                .post("/api/v1/auth/register")
+                .send({
+                    userName: "user2",
+                    email: "user2@gmail.com",
+                    password: "password",
+                });
+            const user3 = await superTest(app)
+                .post("/api/v1/auth/register")
+                .send({
+                    userName: "user3",
+                    email: "user3@gmail.com",
+                    password: "password",
+                });
+            //?create the 3 users:end
+            //?create the main user : start
+            const mainUser = await superTest(app)
+                .post("/api/v1/auth/register")
+                .send({
+                    userName: "mainUser",
                     email: "mainUser@gmail.com",
                     password: "password",
                 });
             const cookies = mainUser.headers["set-cookie"];
+            //?create the main user : end
+            //!add 2 users as friends to the main user :start
+            await superTest(app)
+                .post(`/api/v1/users/${user1.body.userId}`)
+                .set("cookie", cookies);
+            await superTest(app)
+                .post(`/api/v1/users/${user2.body.userId}`)
+                .set("cookie", cookies);
+            //!add 2 users as friends to the main user :end
+            //todo before each :end
             const responce = await superTest(app)
                 .get("/api/v1/friends")
                 .set("cookie", cookies);
@@ -108,12 +108,12 @@ describe("test only best cases here", () => {
                     email: "mainUser@gmail.com",
                     password: "password",
                 });
-    
+
             const cookies = mainUser.headers["set-cookie"];
             const allFriends = await superTest(app)
                 .get("/api/v1/friends")
                 .set("cookie", cookies);
-    
+
             const responce = await superTest(app)
                 .get(`/api/v1/friends/${allFriends.body.data[0]._id}`)
                 .set("cookie", cookies);
@@ -130,30 +130,32 @@ describe("test only best cases here", () => {
                     email: "mainUser@gmail.com",
                     password: "password",
                 });
-    
+
             const cookies = mainUser.headers["set-cookie"];
 
             let allFriends = await superTest(app)
                 .get("/api/v1/friends")
                 .set("cookie", cookies);
-    
+
             //?delete the first friend of the main user
-            let relationId = await superTest(app).get(`/api/v1/friends/${allFriends.body.data[0]._id}`).set("cookie", cookies);
+            let relationId = await superTest(app)
+                .get(`/api/v1/friends/${allFriends.body.data[0]._id}`)
+                .set("cookie", cookies);
             relationId = relationId.body.relationInfos._id;
             const responce = await superTest(app)
-                .delete(`/api/v1/friends/${allFriends.body.data[0]._id}/${relationId}`)
+                .delete(
+                    `/api/v1/friends/${allFriends.body.data[0]._id}/${relationId}`
+                )
                 .set("cookie", cookies);
             expect(responce.status).toBe(200);
             expect(responce.body.success).toBe(true);
-            expect(responce.body.msg).toBe(`friend with id ${allFriends.body.data[0]._id} deleted`);
+            expect(responce.body.msg).toBe(
+                `friend with id ${allFriends.body.data[0]._id} deleted`
+            );
             allFriends = await superTest(app)
                 .get("/api/v1/friends")
                 .set("cookie", cookies);
             expect(allFriends.body.data.length).toBe(1);
-
-
         });
     });
-
 });
-
