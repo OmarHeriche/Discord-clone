@@ -10,7 +10,7 @@ const refreshToken = async (req,res,next)=>{
         next();
         return;
     }
-    console.log("🚨🚨🚨🚨🚨🚨🚨🚨the refreshToken middleware is invoked 🚨🚨🚨🚨🚨🚨🚨🚨");
+    // console.log("🚨🚨🚨🚨🚨🚨🚨🚨the refreshToken middleware is invoked 🚨🚨🚨🚨🚨🚨🚨🚨");
     const refreshToken = req.cookies.refreshToken;
     if(!refreshToken){
         return res.status(401).json({success:false,message:"please login first"});
