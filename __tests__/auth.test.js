@@ -65,10 +65,9 @@ describe("the best cases for the auth controllers", () => {
                     email: "omar1@gmail.com",
                     password: "password",
                 });
-            expect(response.body).toStrictEqual({
-                success: true,
-                name: "omar1",
-            });
+            expect(response.body.success).toBe(true);
+            expect(response.body.name).toBe("omar1");
+            expect(response.body.userId).toBeDefined();
         });
 
         it("check the refresh token and the access token in the http only coockies", async () => {
@@ -119,10 +118,9 @@ describe("the best cases for the auth controllers", () => {
                     email: "omar1@gmail.com",
                     password: "password",
                 });
-            expect(response.body).toStrictEqual({
-                success: true,
-                name: "omar1",
-            });
+            expect(response.body.success).toBe(true);
+            expect(response.body.name).toBe("omar1");
+            expect(response.body.userId).toBeDefined();
         });
         it("check the refresh token and the access token in the http only coockies", async () => {
             const response = await superTest(app)
