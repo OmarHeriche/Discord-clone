@@ -9,6 +9,7 @@ const getAllMessages = async (req, res) => {
         req.body.recipientId = req.params.recipientId;
         let messages = null;
         messages = await redis.lrange(theOwner, 0, -1);
+        
         if (messages.length > 0) {
             return res
                 .status(200)
@@ -31,8 +32,8 @@ const getAllMessages = async (req, res) => {
         messages = messages.slice(0, max_number_of_messages_per_time);
         //?caching messages one by one
         messages.forEach(async (message) => {
-            await redis.rpop(theOwner); //?removing the oldest message
-            await redis.lpush(theOwner, JSON.stringify(message)); //?adding the newest message
+            await redis.lpop(theOwner); //?removing the oldest message
+            await redis.rpush(theOwner, JSON.stringify(message)); //?adding the newest message
         });
         res.status(200).json({
             cache: "cach miss",
@@ -56,10 +57,10 @@ const createMessage = async (req, res) => {
         req.body.recipientId = req.params.recipientId;
         let cpt = await redis.llen(theOwner);
         if (cpt === max_number_of_messages_per_time) {
-            await redis.rpop(theOwner);
+            await redis.lpop(theOwner);
         }
         let message = await Message.create(req.body);
-        await redis.lpush(theOwner, JSON.stringify(message));
+        await redis.rpush(theOwner, JSON.stringify(message));
         res.status(201).json({
             cachLength:cpt,
             success: true,

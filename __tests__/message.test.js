@@ -104,7 +104,7 @@ describe("testing the perfect cases 🔴 the user is logged in && 🔴 the recip
 
 
             const response = await superTest(app).get(`/api/v1/messages/${recipient._id}`).set("cookie", cookies);
-
+            console.log(response.body.data)
             expect(response.status).toBe(200);
             expect(response.body.success).toBe(true);
             expect(response.body.data[0].messageContent).toBe("first message");
