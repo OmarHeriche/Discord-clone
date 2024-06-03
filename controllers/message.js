@@ -1,7 +1,6 @@
 const Message = require("../models/message");
 const redis = require("../db/connect_redis");
 let max_number_of_messages_per_time = 10;
-let the_number_of_new_messages = 0;
 
 const getAllMessages = async (req, res) => {
     try {
@@ -48,40 +47,24 @@ const getAllMessages = async (req, res) => {
         });
     }
 };
+
 const createMessage = async (req, res) => {
+    //todo the caching policy to use in this commit : walk back.
     try {
-        let message = new Object();
         const theOwner = `${req.user.userId}-${req.params.recipientId}`;
         req.body.createdBy = req.user.userId;
         req.body.recipientId = req.params.recipientId;
-        //?store it in the cach first
-        message.messageContent = req.body;
-        message.createdBy = req.body.createdBy;
-        message.recipientId = req.body.recipientId;
         let cpt = await redis.llen(theOwner);
         if (cpt === max_number_of_messages_per_time) {
             await redis.rpop(theOwner);
         }
+        let message = await Message.create(req.body);
         await redis.lpush(theOwner, JSON.stringify(message));
-        the_number_of_new_messages++;
-        if(the_number_of_new_messages === max_number_of_messages_per_time){
-            the_number_of_new_messages=0;
-            //!store the full cach of new messages in db
-            let messages_in_cach_to_go_db = await redis.lrange(theOwner, 0, -1);
-            await Message.insertMany(messages_in_cach_to_go_db);
-            return res.status(201).json({
-                cachLength:cpt,
-                success: true,
-                data: message,
-            });
-        }
-        else{
-            return res.status(201).json({
-                cachLength:cpt,
-                success: true,
-                data: message,
-            });
-        }
+        res.status(201).json({
+            cachLength:cpt,
+            success: true,
+            data: message,
+        });
     } catch (error) {
         res.status(500).json({
             success: false,
