@@ -1,22 +1,94 @@
 const Message = require("../models/message");
+const redis = require("../db/connect_redis");
+let max_number_of_messages_per_time = 10;
+let the_number_of_new_messages = 0;
 
 const getAllMessages = async (req, res) => {
-    req.body.createdBy = req.user.userId;
-    req.body.recipientId = req.params.recipientId;
-    const messagesCreatedByMe = await Message.find(req.body).sort("createdAt");
-    const messagesReceivedByMe = await Message.find({createdBy:req.body.recipientId,recipientId:req.body.createdBy}).sort("createdAt");
-    const messages = messagesCreatedByMe.concat(messagesReceivedByMe);
-    //?sorting messages by createdAt
-    messages.sort((a, b) => {
-        return a.createdAt - b.createdAt;
-    });
-    res.status(200).json({ success: true, data: messages });
+    try {
+        const theOwner = `${req.user.userId}-${req.params.recipientId}`;
+        req.body.createdBy = req.user.userId;
+        req.body.recipientId = req.params.recipientId;
+        let messages = null;
+        messages = await redis.lrange(theOwner, 0, -1);
+        if (messages.length > 0) {
+            return res
+                .status(200)
+                .json({ cache: "cach hit", success: true, data: messages });
+        }
+
+        const messagesCreatedByMe = await Message.find(req.body).sort(
+            "createdAt"
+        );
+        const messagesReceivedByMe = await Message.find({
+            createdBy: req.body.recipientId,
+            recipientId: req.body.createdBy,
+        }).sort("createdAt");
+        messages = messagesCreatedByMe.concat(messagesReceivedByMe);
+        //?sorting messages by createdAt
+        messages.sort((a, b) => {
+            return a.createdAt - b.createdAt;
+        });
+        //?caching messages only the newes 20 messages
+        messages = messages.slice(0, max_number_of_messages_per_time);
+        //?caching messages one by one
+        messages.forEach(async (message) => {
+            await redis.rpop(theOwner); //?removing the oldest message
+            await redis.lpush(theOwner, JSON.stringify(message)); //?adding the newest message
+        });
+        res.status(200).json({
+            cache: "cach miss",
+            success: true,
+            data: messages,
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            msg: "internal sever error",
+            errorMessage: error.message,
+        });
+    }
 };
 const createMessage = async (req, res) => {
-    req.body.createdBy = req.user.userId;
-    req.body.recipientId = req.params.recipientId;
-    const message = await Message.create(req.body);
-    res.status(201).json({ success: true, data: message });
+    try {
+        let message = new Object();
+        const theOwner = `${req.user.userId}-${req.params.recipientId}`;
+        req.body.createdBy = req.user.userId;
+        req.body.recipientId = req.params.recipientId;
+        //?store it in the cach first
+        message.messageContent = req.body;
+        message.createdBy = req.body.createdBy;
+        message.recipientId = req.body.recipientId;
+        let cpt = await redis.llen(theOwner);
+        if (cpt === max_number_of_messages_per_time) {
+            await redis.rpop(theOwner);
+        }
+        await redis.lpush(theOwner, JSON.stringify(message));
+        the_number_of_new_messages++;
+        if(the_number_of_new_messages === max_number_of_messages_per_time){
+            the_number_of_new_messages=0;
+            //!store the full cach of new messages in db
+            let messages_in_cach_to_go_db = await redis.lrange(theOwner, 0, -1);
+            await Message.insertMany(messages_in_cach_to_go_db);
+            return res.status(201).json({
+                cachLength:cpt,
+                success: true,
+                data: message,
+            });
+        }
+        else{
+            return res.status(201).json({
+                cachLength:cpt,
+                success: true,
+                data: message,
+            });
+        }
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            msg: "internal sever error",
+            errorMessage: error.message,
+        });
+    }
 };
 const updateMessage = async (req, res) => {
     req.body.createdBy = req.user.userId;
