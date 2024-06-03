@@ -19,8 +19,10 @@ require("redis");
 const { MongoMemoryServer } = require("mongodb-memory-server"); //todo 🫡🫡🫡🫡🫡🫡🫡🫡🫡🫡🫡🫡
 const mongoose = require("mongoose");
 //?in memory instance of the mongodb:end
+const redis = require("../db/connect_redis");
 //!import :end
 const app = createApp(
+    redis,
     express,
     notFound,
     userRouter,

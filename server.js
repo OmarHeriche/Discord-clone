@@ -12,21 +12,33 @@ const auth = require("./middleware/authentication");
 const refreshToken = require("./middleware/refreshToken");
 require("dotenv").config();
 require("express-async-errors");
-const createApp = require('./app');
+const createApp = require("./app");
+const redis = require("./db/connect_redis");
 //!import :end
 
-
-const app = createApp(express,notFound,userRouter,friendRouter,register_login_router,groupRouter,messageRouter,auth,cookieParcer,refreshToken);
+const app = createApp(
+    redis,
+    express,
+    notFound,
+    userRouter,
+    friendRouter,
+    register_login_router,
+    groupRouter,
+    messageRouter,
+    auth,
+    cookieParcer,
+    refreshToken
+);
 const PORT = process.env.PORT || 3000;
 
 const start = async () => {
-  try {
-    await connectDB(process.env.MONGO_URI);
-    app.listen(PORT, () => {
-      console.log(`Server is running on port ${PORT}  💻`);
-    });
-  } catch (error) {
-    console.log(error);
-  }
-}
+    try {
+        await connectDB(process.env.MONGO_URI);
+        app.listen(PORT, () => {
+            console.log(`Server is running on port ${PORT}  💻`);
+        });
+    } catch (error) {
+        console.log(error);
+    }
+};
 start();
