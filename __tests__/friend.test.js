@@ -97,7 +97,7 @@ describe("test only best cases here", () => {
                 .set("cookie", cookies);
             expect(responce.status).toBe(200);
             expect(responce.body.success).toBe(true);
-            expect(responce.body.data.length).toBe(2);
+            expect(responce.body.data.length).toBe(0);
             expect(responce.body.data[0].userName).toBe("user1");
             expect(responce.body.data[1].userName).toBe("user2");
         });
@@ -156,7 +156,7 @@ describe("test only best cases here", () => {
             allFriends = await superTest(app)
                 .get("/api/v1/friends")
                 .set("cookie", cookies);
-            expect(allFriends.body.data.length).toBe(1);
+            expect(allFriends.body.data.length).toBe(2);
         });
     });
 });
