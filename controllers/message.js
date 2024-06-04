@@ -1,5 +1,6 @@
 const Message = require("../models/message");
 const redis = require("../db/connect_redis");
+const message = require("../models/message");
 let max_number_of_messages_per_time = 10;
 
 const getAllMessages = async (req, res) => {
@@ -9,8 +10,11 @@ const getAllMessages = async (req, res) => {
         req.body.recipientId = req.params.recipientId;
         let messages = null;
         messages = await redis.lrange(theOwner, 0, -1);
-        
+
         if (messages.length > 0) {
+            messages.sort((a, b) => {
+                return new Date(a.createdAt) - new Date(b.createdAt);
+            });
             return res
                 .status(200)
                 .json({ cache: "cach hit", success: true, data: messages });
@@ -28,7 +32,6 @@ const getAllMessages = async (req, res) => {
         messages.sort((a, b) => {
             return a.createdAt - b.createdAt;
         });
-        //?caching messages only the newes 20 messages
         messages = messages.slice(0, max_number_of_messages_per_time);
         //?caching messages one by one
         messages.forEach(async (message) => {
@@ -62,7 +65,7 @@ const createMessage = async (req, res) => {
         let message = await Message.create(req.body);
         await redis.rpush(theOwner, JSON.stringify(message));
         res.status(201).json({
-            cachLength:cpt,
+            cachLength: cpt,
             success: true,
             data: message,
         });
@@ -74,27 +77,58 @@ const createMessage = async (req, res) => {
         });
     }
 };
+
 const updateMessage = async (req, res) => {
-    req.body.createdBy = req.user.userId;
-    req.body.recipientId = req.params.recipientId;
-    const messageId = req.params.messageId;
-    const newMessage = await Message.findOneAndUpdate(
-        {
-            _id: messageId,
-            createdBy: req.body.createdBy,
-            recipientId: req.body.recipientId,
-        },
-        { messageContent: req.body.messageContent },
-        { new: true, runValidators: true }
-    );
-    if (!newMessage) {
-        return res.status(404).json({
-            msg: `there is no message with id = ${messageId}`,
+    //todo the caching policy to use in this commit : walk back.
+    try {
+        const theOwner = `${req.user.userId}-${req.params.recipientId}`;
+        req.body.createdBy = req.user.userId;
+        req.body.recipientId = req.params.recipientId;
+        const messageId = req.params.messageId;
+        const newMessage = await Message.findOneAndUpdate(
+            {
+                _id: messageId,
+                createdBy: req.body.createdBy,
+                recipientId: req.body.recipientId,
+            },
+            { messageContent: req.body.messageContent },
+            { new: true, runValidators: true }
+        );
+        //?check if the message is in the cache
+        let cachedMessages = await redis.lrange(theOwner, 0, -1);
+        if (
+            newMessage.createdAt < cachedMessages[0].createdAt &&
+            newMessage.createdAt >
+                cachedMessages[cachedMessages.length - 1].createdAt
+        ) {
+            cachedMessages = cachedMessages.map(async (message) => {
+                if (message._id == messageId) {
+                    return (message = newMessage);
+                }
+                return message;
+            });
+            //?update the cache
+            await redis.del(theOwner);
+            cachedMessages.forEach(async (message) => {
+                await redis.rpush(theOwner, JSON.stringify(message));
+            });
+        }
+        if (!newMessage) {
+            return res.status(404).json({
+                msg: `there is no message with id = ${messageId}`,
+                success: false,
+            });
+        }
+        res.status(200).json({ success: true, data: newMessage });
+    } catch (error) {
+        res.status(500).json({
             success: false,
+            msg: "internal sever error",
+            errorMessage: error.message,
         });
     }
-    res.status(200).json({ success: true, data: newMessage });
 };
+
 const deleteMessage = async (req, res) => {
     req.body.createdBy = req.user.userId;
     req.body.recipientId = req.params.recipientId;
@@ -112,6 +146,7 @@ const deleteMessage = async (req, res) => {
     }
     res.status(200).json({ success: true, data: deletedMessage });
 };
+
 module.exports = {
     createMessage,
     getAllMessages,
