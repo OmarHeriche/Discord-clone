@@ -114,7 +114,6 @@ const updateMessage = async (req, res) => {
         }
         res.status(200).json({ success: true, data: newMessage });
     } catch (error) {
-        console.log(error);
         res.status(500).json({
             success: false,
             msg: "internal sever error",
@@ -124,21 +123,40 @@ const updateMessage = async (req, res) => {
 };
 
 const deleteMessage = async (req, res) => {
-    req.body.createdBy = req.user.userId;
-    req.body.recipientId = req.params.recipientId;
-    const messageId = req.params.messageId;
-    const deletedMessage = await Message.findOneAndDelete({
-        _id: messageId,
-        createdBy: req.body.createdBy,
-        recipientId: req.body.recipientId,
-    });
-    if (!deleteMessage) {
-        return res.status(404).json({
-            msg: `there is no message with id = ${messageId}`,
+    //todo the caching policy to use in this commit : walk back.
+    try {
+        const theOwner = `${req.user.userId}-${req.params.recipientId}`;
+        req.body.createdBy = req.user.userId;
+        req.body.recipientId = req.params.recipientId;
+        const messageId = req.params.messageId;
+        const deletedMessage = await Message.findOneAndDelete({
+            _id: messageId,
+            createdBy: req.body.createdBy,
+            recipientId: req.body.recipientId,
+        });
+        //?check if the message is in the cache
+        let cachedMessages = await redis.lrange(theOwner, 0, -1);
+        cachedMessages = cachedMessages.filter((cachedMessages) => {
+            return cachedMessages._id !== messageId;
+        });
+        await redis.del(theOwner);
+        cachedMessages.forEach(async (cachedMessages) => {
+            await redis.rpush(theOwner, JSON.stringify(cachedMessages));
+        });
+        if (!deleteMessage) {
+            return res.status(404).json({
+                msg: `there is no message with id = ${messageId}`,
+                success: false,
+            });
+        }
+        res.status(200).json({ success: true, data: deletedMessage });
+    } catch (error) {
+        res.status(500).json({
             success: false,
+            msg: "internal sever error",
+            errorMessage: error.message,
         });
     }
-    res.status(200).json({ success: true, data: deletedMessage });
 };
 
 module.exports = {
