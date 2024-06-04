@@ -96,23 +96,16 @@ const updateMessage = async (req, res) => {
         );
         //?check if the message is in the cache
         let cachedMessages = await redis.lrange(theOwner, 0, -1);
-        if (
-            newMessage.createdAt < cachedMessages[0].createdAt &&
-            newMessage.createdAt >
-                cachedMessages[cachedMessages.length - 1].createdAt
-        ) {
-            cachedMessages = cachedMessages.map(async (message) => {
-                if (message._id == messageId) {
-                    return (message = newMessage);
-                }
-                return message;
-            });
-            //?update the cache
-            await redis.del(theOwner);
-            cachedMessages.forEach(async (message) => {
-                await redis.rpush(theOwner, JSON.stringify(message));
-            });
-        }
+        cachedMessages = cachedMessages.map((cachedMessage) => {
+            if (cachedMessage._id === messageId) {
+                return (cachedMessage = newMessage);
+            }
+            return cachedMessage;
+        });
+        await redis.del(theOwner);
+        cachedMessages.forEach(async (cachedMessages) => {
+            await redis.rpush(theOwner, JSON.stringify(cachedMessages));
+        });
         if (!newMessage) {
             return res.status(404).json({
                 msg: `there is no message with id = ${messageId}`,
@@ -121,6 +114,7 @@ const updateMessage = async (req, res) => {
         }
         res.status(200).json({ success: true, data: newMessage });
     } catch (error) {
+        console.log(error);
         res.status(500).json({
             success: false,
             msg: "internal sever error",
