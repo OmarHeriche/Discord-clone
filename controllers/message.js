@@ -1,7 +1,7 @@
 const Message = require("../models/message");
 const redis = require("../db/connect_redis");
 const message = require("../models/message");
-let max_number_of_messages_per_time = 10;
+const max_number_of_messages_per_time = 10;
 
 const getAllMessages = async (req, res) => {
     try {
@@ -102,7 +102,7 @@ const updateMessage = async (req, res) => {
             }
             return cachedMessage;
         });
-        await redis.del(theOwner);
+        await redis.del(theOwner);//?from the futur kyna haja y9ololha lrem bzaf mliha 👀
         cachedMessages.forEach(async (cachedMessages) => {
             await redis.rpush(theOwner, JSON.stringify(cachedMessages));
         });
@@ -139,7 +139,7 @@ const deleteMessage = async (req, res) => {
         cachedMessages = cachedMessages.filter((cachedMessages) => {
             return cachedMessages._id !== messageId;
         });
-        await redis.del(theOwner);
+        await redis.del(theOwner);//?from the futur kyna haja y9ololha lrem bzaf mliha 👀
         cachedMessages.forEach(async (cachedMessages) => {
             await redis.rpush(theOwner, JSON.stringify(cachedMessages));
         });

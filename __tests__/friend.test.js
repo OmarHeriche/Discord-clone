@@ -143,10 +143,9 @@ describe("test only best cases here", () => {
             let relationId = await superTest(app)
                 .get(`/api/v1/friends/${allFriends.body.data[0]._id}`)
                 .set("cookie", cookies);
-            relationId = relationId.body.relationInfos._id;
             const responce = await superTest(app)
                 .delete(
-                    `/api/v1/friends/${allFriends.body.data[0]._id}/${relationId}`
+                    `/api/v1/friends/${allFriends.body.data[0]._id}`
                 )
                 .set("cookie", cookies);
             expect(responce.status).toBe(200);
