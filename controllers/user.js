@@ -50,11 +50,12 @@ const addFriend = async (req, res) => {
                 success: false,
                 message: `friend with id ${req.params.userId} not found`,
             });
+        const new_friend = await User.findOne({_id:req.params.userId})//!this line is tooooo baad ylzm nbdlha 
         const cachedFriends = await redis.lrange(theOwner, 0, -1);
         if(cachedFriends.length === max_number_of_friends_per_list){
             await redis.rpop(theOwner);
         }
-        await redis.rpush(theOwner, JSON.stringify(newFriend));
+        await redis.rpush(theOwner, JSON.stringify(new_friend));
         res.status(201).json({ success: true, data: newFriend });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });

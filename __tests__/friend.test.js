@@ -97,7 +97,7 @@ describe("test only best cases here", () => {
                 .set("cookie", cookies);
             expect(responce.status).toBe(200);
             expect(responce.body.success).toBe(true);
-            expect(responce.body.data.length).toBe(0);
+            expect(responce.body.data.length).toBe(2);
             expect(responce.body.data[0].userName).toBe("user1");
             expect(responce.body.data[1].userName).toBe("user2");
         });
@@ -124,7 +124,7 @@ describe("test only best cases here", () => {
             expect(responce.body.friendInfos).toEqual(allFriends.body.data[0]);
         });
     });
-    describe("/api/v1/friends => delteFriend", () => {
+    describe("/api/v1/friends => deleteFriend", () => {
         it("should return status 200 and the friend of the main user", async () => {
             const mainUser = await superTest(app)
                 .post("/api/v1/auth/login")
@@ -138,11 +138,8 @@ describe("test only best cases here", () => {
             let allFriends = await superTest(app)
                 .get("/api/v1/friends")
                 .set("cookie", cookies);
-
             //?delete the first friend of the main user
-            let relationId = await superTest(app)
-                .get(`/api/v1/friends/${allFriends.body.data[0]._id}`)
-                .set("cookie", cookies);
+            expect(allFriends.body.data.length).toBe(2);
             const responce = await superTest(app)
                 .delete(
                     `/api/v1/friends/${allFriends.body.data[0]._id}`
@@ -156,7 +153,7 @@ describe("test only best cases here", () => {
             allFriends = await superTest(app)
                 .get("/api/v1/friends")
                 .set("cookie", cookies);
-            expect(allFriends.body.data.length).toBe(2);
+            expect(allFriends.body.data.length).toBe(1);
         });
     });
 });
