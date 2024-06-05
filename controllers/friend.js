@@ -103,7 +103,6 @@ const deleteFriend = async (req, res) => {
             });
         }
         let cachedFriends = await redis.lrange(theOwner, 0, -1);
-        console.log(cachedFriends);
         cachedFriends = cachedFriends.filter((cachedFriend) => {
             return cachedFriend._id !== req.params.userId;
         });
@@ -116,7 +115,6 @@ const deleteFriend = async (req, res) => {
             msg: `friend with id ${req.params.userId} deleted`,
         });
     } catch (error) {
-        console.log(error)
         res.status(500).json({ success: false, msg: error.message });
     }
 };
