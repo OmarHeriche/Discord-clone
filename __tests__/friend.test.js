@@ -1,7 +1,6 @@
 //!import :start
 const refreshToken = require("../middleware/refreshToken");
 const jwt = require("jsonwebtoken");
-const express = require("express");
 const notFound = require("../middleware/notFound");
 const userRouter = require("../routes/user");
 const friendRouter = require("../routes/friend");
@@ -15,13 +14,13 @@ const createApp = require("../app");
 const cookieParcer = require("cookie-parser");
 const auth = require("../middleware/authentication");
 const connectDB = require("../db/connect");
-require("redis");
 //?in memory instance of the mongodb:start
 const { MongoMemoryServer } = require("mongodb-memory-server"); //todo 🫡🫡🫡🫡🫡🫡🫡🫡🫡🫡🫡🫡
 const mongoose = require("mongoose");
-const e = require("express");
+const express = require("express");
 //?in memory instance of the mongodb:end
 const redis = require("../db/connect_redis");
+//? const inMemoryInstanceRedis=require("redis");
 //!import :end
 const app = createApp(
     redis,
@@ -141,9 +140,7 @@ describe("test only best cases here", () => {
             //?delete the first friend of the main user
             expect(allFriends.body.data.length).toBe(2);
             const responce = await superTest(app)
-                .delete(
-                    `/api/v1/friends/${allFriends.body.data[0]._id}`
-                )
+                .delete(`/api/v1/friends/${allFriends.body.data[0]._id}`)
                 .set("cookie", cookies);
             expect(responce.status).toBe(200);
             expect(responce.body.success).toBe(true);
