@@ -6,6 +6,10 @@ function createApp(redis,express,notFound,userRouter,friendRouter,register_login
   const xss = require("xss-clean");
   //!import security packages :end
 
+  const swaggerUi = require("swagger-ui-express");
+  const YAML = require("yamljs");
+  const swaggerDocument = YAML.load("./swagger.yaml");
+
   const app = express();
   //!use the security packages :start
   app.use(cors());//?this to allow the frontend to access the backend
@@ -21,6 +25,11 @@ function createApp(redis,express,notFound,userRouter,friendRouter,register_login
   app.use(express.json());
   app.use(cookieParcer());
   //!my routes :start
+  app.get("/", (req, res) => {
+    res.send('<h1>Messenger</h1><a href="/api-docs">API Documentation</a>');
+  });
+  // app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+  
   app.use("/api/v1/auth", register_login_router);//!create access token and refresh token
   app.use(refreshToken);//!create access token if expired
   app.use(auth);//!initialize the req.user if the access token is valid
@@ -35,11 +44,6 @@ function createApp(redis,express,notFound,userRouter,friendRouter,register_login
     res.clearCookie("expire");
     res.status(200).json({success:true,msg:"logout successfull"});
   })
-  app.get("/", (req, res) => {
-    res.send(
-      `<h1 style="text-align:center">Here i will put the swager documentation:</h1>`
-    );
-  });
   //!my routes :end
   //!error handling :start
   app.use(notFound);

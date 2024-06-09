@@ -1,0 +1,533 @@
+openapi: 3.0.0
+info:
+  title: myMessenger_documentation
+  contact: {}
+  version: '1.0'
+servers:
+- url: https://messenger-omar.onrender.com/api/v1
+  variables: {}
+paths:
+  /logout:
+    get:
+      tags:
+      - Auth
+      summary: logout
+      operationId: logout
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          headers: {}
+      deprecated: false
+      security: []
+  /auth/register:
+    post:
+      tags:
+      - Auth
+      summary: register
+      operationId: register
+      parameters: []
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              allOf:
+              - $ref: '#/components/schemas/registerCopyRequest'
+              - example:
+                  userName: omar
+                  email: heriche@gmail.com
+                  password: password
+            example:
+              userName: omar
+              email: heriche@gmail.com
+              password: password
+        required: true
+      responses:
+        '200':
+          description: ''
+          headers: {}
+      deprecated: false
+      security: []
+  /auth/login:
+    post:
+      tags:
+      - Auth
+      summary: login
+      operationId: login
+      parameters: []
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              allOf:
+              - $ref: '#/components/schemas/loginCopyRequest'
+              - example:
+                  email: second@gmail.com
+                  password: password
+            example:
+              email: second@gmail.com
+              password: password
+        required: true
+      responses:
+        '200':
+          description: ''
+          headers: {}
+      deprecated: false
+      security: []
+  /friends:
+    get:
+      tags:
+      - Friends
+      summary: getAllFriends
+      operationId: getAllFriends
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          headers: {}
+      deprecated: false
+      security:
+      - bearer: []
+  /friends/{id}:
+    parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+        description: The friend ID
+    get:
+      tags:
+      - Friends
+      summary: getSingleFriend
+      operationId: getSingleFriend
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          headers: {}
+      deprecated: false
+      security:
+      - bearer: []
+ 
+    delete:
+      tags:
+      - Friends
+      summary: deleteSingleFriend
+      operationId: deleteSingleFriend
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          headers: {}
+      deprecated: false
+      security:
+      - bearer: []
+  
+    post:
+      tags:
+      - Friends
+      summary: addFriend
+      operationId: addFriend
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          headers: {}
+      deprecated: false
+      security:
+      - bearer: []
+  /groups:
+    get:
+      tags:
+      - Groups
+      summary: getAllGroups
+      operationId: getAllGroups
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          headers: {}
+      deprecated: false
+      security:
+      - bearer: []
+    post:
+      tags:
+      - Groups
+      summary: addGroup
+      operationId: addGroup
+      parameters: []
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              allOf:
+              - $ref: '#/components/schemas/addGroupCopyRequest'
+              - example:
+                  groupName: group2
+            example:
+              groupName: group2
+        required: true
+      responses:
+        '200':
+          description: ''
+          headers: {}
+      deprecated: false
+      security:
+      - bearer: []
+  /groups/{id}:
+    parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+        description: The group ID
+    get:
+      tags:
+      - Groups
+      summary: getSingleGroup
+      operationId: getSingleGroup
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          headers: {}
+      deprecated: false
+      security:
+      - bearer: []
+  /groups/{id}/members:
+    parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+        description: The group ID
+    get:
+      tags:
+      - Groups
+      summary: getAllMembersOfGroup
+      operationId: getAllMembersOfGroup
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          headers: {}
+      deprecated: false
+  /groups/{id}/members/{id}:
+    parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+        description: The group ID
+    delete:
+      tags:
+      - Groups
+      summary: deleteUserFromeGroup
+      operationId: deleteUserFromeGroup
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          headers: {}
+      deprecated: false
+      security:
+      - bearer: []
+  /groups/{id}:
+    parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+        description: The group ID
+    delete:
+      tags:
+      - Groups
+      summary: deleteGroup
+      operationId: deleteGroup
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          headers: {}
+      deprecated: false
+      security:
+      - bearer: []
+  /groups/{id}/members/{id}:
+    parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+        description: The group ID
+    post:
+      tags:
+      - Groups
+      summary: addUserToGroup
+      operationId: addUserToGroup
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          headers: {}
+      deprecated: false
+      security:
+      - bearer: []
+  /groups/{id}:
+    parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+        description: The group ID
+    patch:
+      tags:
+      - Groups
+      summary: updateGroup
+      operationId: updateGroup
+      parameters: []
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              allOf:
+              - $ref: '#/components/schemas/updateGroupCopyRequest'
+              - example:
+                  groupName: second up omar group
+            example:
+              groupName: second up omar group
+        required: true
+      responses:
+        '200':
+          description: ''
+          headers: {}
+      deprecated: false
+      security:
+      - bearer: []
+  /messages/{id}:
+    parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+        description: The message ID
+    post:
+      tags:
+      - Messages
+      summary: createMessage
+      operationId: createMessage
+      parameters: []
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              allOf:
+              - $ref: '#/components/schemas/createMessageCopyRequest'
+              - example:
+                  messageContent: first user to second user message number 5
+            example:
+              messageContent: first user to second user message number 5
+        required: true
+      responses:
+        '200':
+          description: ''
+          headers: {}
+      deprecated: false
+      security:
+      - bearer: []
+    get:
+      tags:
+      - Messages
+      summary: getAllMessages
+      operationId: getAllMessages
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          headers: {}
+      deprecated: false
+      security:
+      - bearer: []
+  /messages/{id}/{id}:
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: The message ID
+  patch:
+      tags:
+      - Messages
+      summary: updateMessage
+      operationId: updateMessage
+      parameters: []
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              allOf:
+              - $ref: '#/components/schemas/updateMessageCopyRequest'
+              - example:
+                  messageContent: first user to second user 2 =========> updated by user one v33
+            example:
+              messageContent: first user to second user 2 =========> updated by user one v33
+        required: true
+      responses:
+        '200':
+          description: ''
+          headers: {}
+      deprecated: false
+      security:
+      - bearer: []
+  delete:
+      tags:
+      - Messages
+      summary: deleteMessage
+      operationId: deleteMessage
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          headers: {}
+      deprecated: false
+      security:
+      - bearer: []
+  /users:
+    get:
+      tags:
+      - Users
+      summary: getAllUsers
+      operationId: getAllUsers
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          headers: {}
+      deprecated: false
+      security:
+      - bearer: []
+  /messages/{id}:
+    parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+        description: The message ID
+    get:
+      tags:
+      - Users
+      summary: getSingleUser
+      operationId: getSingleUser
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          headers: {}
+      deprecated: false
+      security:
+      - bearer: []
+components:
+  schemas:
+    registerCopyRequest:
+      title: registerCopyRequest
+      required:
+      - userName
+      - email
+      - password
+      type: object
+      properties:
+        userName:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+      example:
+        userName: omar
+        email: heriche@gmail.com
+        password: password
+    loginCopyRequest:
+      title: loginCopyRequest
+      required:
+      - email
+      - password
+      type: object
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+      example:
+        email: second@gmail.com
+        password: password
+    createMessageCopyRequest:
+      title: createMessageCopyRequest
+      required:
+      - messageContent
+      type: object
+      properties:
+        messageContent:
+          type: string
+      example:
+        messageContent: first user to second user message number 5
+    updateMessageCopyRequest:
+      title: updateMessageCopyRequest
+      required:
+      - messageContent
+      type: object
+      properties:
+        messageContent:
+          type: string
+      example:
+        messageContent: first user to second user 2 =========> updated by user one v33
+    addGroupCopyRequest:
+      title: addGroupCopyRequest
+      required:
+      - groupName
+      type: object
+      properties:
+        groupName:
+          type: string
+      example:
+        groupName: group2
+    updateGroupCopyRequest:
+      title: updateGroupCopyRequest
+      required:
+      - groupName
+      type: object
+      properties:
+        groupName:
+          type: string
+      example:
+        groupName: second up omar group
+  securitySchemes:
+    bearer:
+      type: http
+      scheme: bearer
+security: []
+tags:
+- name: Auth
+  description: ''
+- name: Friends
+  description: ''
+- name: Groups
+  description: ''
+- name: Messages
+  description: ''
+- name: Users
+  description: ''
