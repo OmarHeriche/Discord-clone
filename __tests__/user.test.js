@@ -5,7 +5,7 @@ const express = require("express");
 const notFound = require("../middleware/notFound");
 const userRouter = require("../routes/user");
 const friendRouter = require("../routes/friend");
-const register_login_router = require("../routes/auth");
+const register_login_router = require("../routes/auth"); 
 const groupRouter = require("../routes/group");
 const messageRouter = require("../routes/message");
 require("dotenv").config();
