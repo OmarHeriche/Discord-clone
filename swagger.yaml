@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  title: myMessenger_documentation
+  title: discord-clone
   contact: {}
   version: '1.0'
 servers:
@@ -33,7 +33,7 @@ paths:
           application/json:
             schema:
               allOf:
-              - $ref: '#/components/schemas/registerCopyRequest'
+              - $ref: '#/components/schemas/registerrequest'
               - example:
                   userName: omar
                   email: heriche@gmail.com
@@ -62,7 +62,7 @@ paths:
           application/json:
             schema:
               allOf:
-              - $ref: '#/components/schemas/loginCopyRequest'
+              - $ref: '#/components/schemas/loginrequest'
               - example:
                   email: second@gmail.com
                   password: password
@@ -90,10 +90,10 @@ paths:
       deprecated: false
       security:
       - bearer: []
-  /friends/{id}:
+  /friends/{friendId}:
     parameters:
       - in: path
-        name: id
+        name: friendId
         schema:
           type: string
         required: true
@@ -111,7 +111,7 @@ paths:
       deprecated: false
       security:
       - bearer: []
- 
+  
     delete:
       tags:
       - Friends
@@ -165,7 +165,7 @@ paths:
           application/json:
             schema:
               allOf:
-              - $ref: '#/components/schemas/addGroupCopyRequest'
+              - $ref: '#/components/schemas/addGroupRequest'
               - example:
                   groupName: group2
             example:
@@ -239,7 +239,7 @@ paths:
       deprecated: false
       security:
       - bearer: []
-  /groups/{id}:
+  /groups/{id}/ :
     parameters:
       - in: path
         name: id
@@ -260,7 +260,7 @@ paths:
       deprecated: false
       security:
       - bearer: []
-  /groups/{id}/members/{id}:
+  /groups/{id}/members/{id}/:
     parameters:
       - in: path
         name: id
@@ -281,10 +281,10 @@ paths:
       deprecated: false
       security:
       - bearer: []
-  /groups/{id}:
+  /groups/{groupId}:
     parameters:
       - in: path
-        name: id
+        name: groupId
         schema:
           type: string
         required: true
@@ -301,7 +301,7 @@ paths:
           application/json:
             schema:
               allOf:
-              - $ref: '#/components/schemas/updateGroupCopyRequest'
+              - $ref: '#/components/schemas/updateGroupRequest'
               - example:
                   groupName: second up omar group
             example:
@@ -314,14 +314,14 @@ paths:
       deprecated: false
       security:
       - bearer: []
-  /messages/{id}:
+  /messages/{friendId}:
     parameters:
       - in: path
-        name: id
+        name: friendId
         schema:
           type: string
         required: true
-        description: The message ID
+        description: The friend ID
     post:
       tags:
       - Messages
@@ -334,7 +334,7 @@ paths:
           application/json:
             schema:
               allOf:
-              - $ref: '#/components/schemas/createMessageCopyRequest'
+              - $ref: '#/components/schemas/createMessageRequest'
               - example:
                   messageContent: first user to second user message number 5
             example:
@@ -361,14 +361,15 @@ paths:
       security:
       - bearer: []
   /messages/{id}/{id}:
-      parameters:
-        - in: path
-          name: id
-          schema:
-            type: string
-          required: true
-          description: The message ID
-  patch:
+    parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+        description: The friend ID
+      
+    patch:
       tags:
       - Messages
       summary: updateMessage
@@ -380,7 +381,7 @@ paths:
           application/json:
             schema:
               allOf:
-              - $ref: '#/components/schemas/updateMessageCopyRequest'
+              - $ref: '#/components/schemas/updateMessageRequest'
               - example:
                   messageContent: first user to second user 2 =========> updated by user one v33
             example:
@@ -393,7 +394,7 @@ paths:
       deprecated: false
       security:
       - bearer: []
-  delete:
+    delete:
       tags:
       - Messages
       summary: deleteMessage
@@ -420,14 +421,14 @@ paths:
       deprecated: false
       security:
       - bearer: []
-  /messages/{id}:
+  /messages/{userId}:
     parameters:
       - in: path
-        name: id
+        name: userId
         schema:
           type: string
         required: true
-        description: The message ID
+        description: The friend ID
     get:
       tags:
       - Users
@@ -443,8 +444,8 @@ paths:
       - bearer: []
 components:
   schemas:
-    registerCopyRequest:
-      title: registerCopyRequest
+    registerrequest:
+      title: registerrequest
       required:
       - userName
       - email
@@ -461,8 +462,8 @@ components:
         userName: omar
         email: heriche@gmail.com
         password: password
-    loginCopyRequest:
-      title: loginCopyRequest
+    loginrequest:
+      title: loginrequest
       required:
       - email
       - password
@@ -475,8 +476,8 @@ components:
       example:
         email: second@gmail.com
         password: password
-    createMessageCopyRequest:
-      title: createMessageCopyRequest
+    createMessageRequest:
+      title: createMessageRequest
       required:
       - messageContent
       type: object
@@ -485,8 +486,8 @@ components:
           type: string
       example:
         messageContent: first user to second user message number 5
-    updateMessageCopyRequest:
-      title: updateMessageCopyRequest
+    updateMessageRequest:
+      title: updateMessageRequest
       required:
       - messageContent
       type: object
@@ -495,8 +496,8 @@ components:
           type: string
       example:
         messageContent: first user to second user 2 =========> updated by user one v33
-    addGroupCopyRequest:
-      title: addGroupCopyRequest
+    addGroupRequest:
+      title: addGroupRequest
       required:
       - groupName
       type: object
@@ -505,8 +506,8 @@ components:
           type: string
       example:
         groupName: group2
-    updateGroupCopyRequest:
-      title: updateGroupCopyRequest
+    updateGroupRequest:
+      title: updateGroupRequest
       required:
       - groupName
       type: object
@@ -521,6 +522,7 @@ components:
       scheme: bearer
 security: []
 tags:
+
 - name: Auth
   description: ''
 - name: Friends
